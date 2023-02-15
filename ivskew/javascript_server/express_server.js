@@ -19,8 +19,8 @@ const axios = require('axios');
 const path = require('path');
 //((a < b) ? 'minor' : 'major');
 const PORT = (argv.length>0) ? argv[0] : 3010;
-const FASTAPI_URL = 'http://localhost:' + ((argv.length>1) ? argv[1] : '8555');
-const     FASTAPI_ROUTE_get_futures_skew = '/get_futures_skew';
+const FASTAPI_URL = 'http://127.0.0.1:' + ((argv.length>1) ? argv[1] : '8555');
+const FASTAPI_ROUTE_get_futures_skew = '/get_futures_skew';
 var FASTAPI_ROUTE_df_from_csv = '/df_from_csv';
 
 app.use(express.static(path.join(__dirname, 'public')));
