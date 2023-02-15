@@ -23,6 +23,7 @@ import pandas as pd
 import tqdm
 import traceback
 import pathlib
+import pdb
 
 from IPython.display import display
 
@@ -64,14 +65,14 @@ STYLE_TITLE={
 } 
 
 # read configuration
-try:
-    configs = json.load(open('./futures_skew.conf','r'))
-    logger.info(f'using configs located at futures_skew.conf')
-except:
-    traceback.print_exc()
-    logger.info(f'using default configs')
-    configs = DEFAULT_CONFIGS.copy()
-
+# try:
+#     configs = json.load(open('./futures_skew.conf','r'))
+#     logger.info(f'using configs located at futures_skew.conf')
+# except:
+#     traceback.print_exc()
+#     logger.info(f'using default configs')
+#     configs = DEFAULT_CONFIGS.copy()
+configs = DEFAULT_CONFIGS.copy()
 
 PATH_DATA_HOME = configs['PATH_DATA_HOME']
 FILENAME_SKEW = 'df_iv_skew_COMMOD.csv'
@@ -145,10 +146,14 @@ class IvSkewStatic:
         for commod in ['CL','CB','ES','NG']:
             fn_skew = FILENAME_SKEW.replace('COMMOD',commod)
             df_skew = pd.read_csv(f'{PATH_DATA_HOME}/{fn_skew}')
+            df_skew = df_skew.dropna()
             fn_iv = FILENAME_IV.replace('COMMOD',commod)
             df_iv = pd.read_csv(f'{PATH_DATA_HOME}/{fn_iv}')
+            df_iv = df_iv[[c for c in df_iv.columns.values if c not in ['close_x','pc']]]
+            df_iv = df_iv.dropna()
             fn_fut = FILENAME_FUT.replace('COMMOD',commod)
             df_fut = pd.read_csv(f'{PATH_DATA_HOME}/{fn_fut}')
+            df_fut = df_fut.dropna()
             df_skew['commod'] = commod
             df_iv['commod'] = commod
             df_fut['commod'] = commod
@@ -266,12 +271,19 @@ class IvSkewStatic:
 
 
 if __name__=='__main__':
+    args = sys.argv;
+    commod = "CL"
+    year = 2020
+    if len(args)>1:
+        commod = args[1]
+    if len(args)>2:
+        year = int(args[2])
 
     sks = IvSkewStatic()
 
-    iplot(sks.plot_atm_vs_close('CL',year=2020))
+    iplot(sks.plot_atm_vs_close(commod,year=year))
     for d in [.05,.1,.2]:
-        fig1,fig2 = sks.plot_skew_vs_atm('CL',dist_from_zero=d,year=2020)
+        fig1,fig2 = sks.plot_skew_vs_atm(commod,dist_from_zero=d,year=year)
         iplot(fig1)
         iplot(fig2)
 

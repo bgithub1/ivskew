@@ -60,11 +60,12 @@ async def root():
 async def get_futures_skew(commodity:str='CL',year:int=2020):
     return_dict = {}
     sks = fskew.IvSkewStatic()
-    fig0 = sks.plot_atm_vs_close(commodity,year=year).to_dict()
+    y = int(str(year))
+    fig0 = sks.plot_atm_vs_close(commodity,year=y).to_dict()
     return_dict['atm_vs_close'] = fig0
     atm_vs_skew = []
     for d in [.05,.1,.2]:
-        fig1,fig2 = sks.plot_skew_vs_atm(commodity,dist_from_zero=d,year=year)
+        fig1,fig2 = sks.plot_skew_vs_atm(commodity,dist_from_zero=d,year=y)
         fig1 = fig1.to_dict()
         fig2 = fig2.to_dict()
         atm_vs_skew.append({'skew_vs_atm_iv':fig1,'skew_vs_close':fig2})

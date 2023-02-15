@@ -291,6 +291,12 @@ async function display_spdr_etf_csvs(){
   }  
 };
 
+async function get_graphs(){
+  var commodity_choice = document.getElementById('commodity_select').value;
+  var year_choice = document.getElementById('year_select').value;
+  year_choice = Math.floor( year_choice );
+  render_skew(commodity=commodity_choice,year=year_choice);
+}
 
 async function render_skew(commodity='CL',year=2020){
   const url = `/get_futures_skew?commodity=${commodity}&year=${year}`;
