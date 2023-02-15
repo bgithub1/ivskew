@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0 user-scalable=n"/>
+  <link rel="stylesheet" type="text/css" href="css/proj_styles.css">
+
+</head>
+<body>
+
+  <div style="width:98vw" class="container-fluid">
+    
+    <div class="row">
+        <button class="col-xs-12 fstitle" id="title">FastAPI/Express App Example</button>
+    </div>
+    
+    <div class="row align-items-center">
+      <div class="col-xs-4"></div>
+      <div id="spinner" class="spinner col-xs-4"></div>
+      <div class="col-xs-4"></div>
+    </div>
+
+    <div class="row">
+      <button  class="col-xs-5 selectinbutton">
+        <label  for="commodity">Select a Commodity:&nbsp;</label>
+        <select name="commodity" id="commodity">
+          <option value="CL">CL</option>
+          <option value="NG">NG</option>
+          <option value="ES">ES</option>
+          <option value="CB">CB</option>
+        </select> 
+      </button>
+      <button class="col-xs-5 selectinbutton">
+        <label  for="year">Select a Year:&nbsp;</label>
+        <select name="year" id="year">
+          <option value="2017">2017</option>
+          <option value="2018">2018</option>
+          <option value="2019">2019</option>
+          <option value="2020">2020</option>
+        </select>  
+      </button>      
+      <button class="col-xs-2 selectinbutton">
+        <input style="border:none" type="submit" value="Submit">
+      </button>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="atm_vs_close_plot" style="width:99%"></div>
+      </div>         
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="skew_vs_atm_iv_plot_0" style="width:99%"></div>
+      </div>         
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="skew_vs_close_plot_0" style="width:99%"></div>
+      </div>         
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="skew_vs_atm_iv_plot_1" style="width:99%"></div>
+      </div>         
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="skew_vs_close_plot_1" style="width:99%"></div>
+      </div>         
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="skew_vs_atm_iv_plot_2" style="width:99%"></div>
+      </div>         
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="skew_vs_close_plot_2" style="width:99%"></div>
+      </div>         
+    </div>
+
+    <div class="row">
+      <div class="bord col-sm-12">
+        <table  class="stripe" style="width:99%" id="atm_vs_close" >
+          <caption style="color:#47bacc;text-align:center;font-weight: bold;">ATM VOL vs SKEW</caption>
+        </table>
+      </div> 
+    </div>
+
+    <div class="row">
+      <div class="bord col-sm-12">
+        <table class="stripe" style="width:99%" id="spdr_etf_options">
+          <caption style="color:#47bacc;text-align:center;font-weight: bold;">SPDR ETF Options</caption>
+        </table>
+      </div>   
+    </div> 
+
+    <div class="row">
+        <div class="col-sm-12">
+        <div id="candle_plot" style="width:99%"></div>
+      </div>         
+    </div>  
+
+
+    <div class="row align-items-center">
+      <input id="file-upload" class="col-xs-12" type="file" accept=".csv" onchange="get_local_csv_file()" />
+    </div>   
+  
+    <div class="row">
+      <div class="bord col-sm-12">
+        <table class="stripe" style="width:99%" id="df_from_csv">
+          <caption style="color:#47bacc;text-align:center;font-weight: bold;">User CSV File</caption>
+        </table>
+      </div>   
+    </div> 
+
+  </div>
+
+
+
+  
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+
+  <!-- plotly.js -->
+  <script src="https://cdn.plot.ly/plotly-2.17.1.min.js"></script>
+  <!-- Latest compiled and minified CSS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/d3-dsv@3"></script>
+  <script src="js/proj_javascript.js"></script>
+
+
+  <script> 
+    window.onload = initit();
+  </script>    
+</body>
