@@ -21,12 +21,6 @@ import futures_skew as fskew
 # The GlobalVariables class allows you to populate global variables from the __main__
 #  Below, I define a redis_port variable that I might want to use later in one of the 
 #  FastAPI routes.  For now it is unused.
-class GlobalVariables:
-    pass
-__m = GlobalVariables()  # m will contain all module-level values
-__m.redis_port = None  # database name global in module
-
-
 
 app = FastAPI()
 
@@ -50,6 +44,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class GlobalVariables:
+    pass
+__m = GlobalVariables()  # m will contain all module-level values
+__m.redis_port = None  # database name global in module
+__m.origins = origins
 
 
 @app.get("/")
@@ -117,6 +117,7 @@ if __name__ == "__main__":
     hour = datetime.datetime.now().hour
     parser.add_argument('--host',default='127.0.0.1',type=str,help="uvicorn http host") 
     parser.add_argument('--port',default=8555,type=int,help="uvicorn http port") 
+    parser.add_argument('--originport',default=3010,type=int,help="express origin http port") 
     parser.add_argument('--reload',
         help="Tell uvicorn to automatically reload server if source code changes",
         action='store_true'
@@ -128,6 +129,7 @@ if __name__ == "__main__":
     args = parser.parse_args()  
     print(args)
     __m.redis_port = args.redis_port
+    __m.origins.append(f"http://localhost:{args.originport}")
 
     uvicorn.run(
         "fastapi_server:app", 
