@@ -32,10 +32,11 @@ from matplotlib.patches import Polygon
 
 import dash
 import dash_html_components as html
-import plotly.graph_objs as go
-import plotly.tools as tls
+import plotly_utilities as pu
+# import plotly.graph_objs as go
+# import plotly.tools as tls
 from plotly.offline import  iplot
-from plotly.graph_objs.layout import Font,Margin
+# from plotly.graph_objs.layout import Font,Margin
 
 # if  not os.path.abspath('./') in sys.path:
 #     sys.path.append(os.path.abspath('./'))
@@ -81,55 +82,58 @@ FILENAME_FUT = 'df_cash_futures_COMMOD.csv'
 
 SKEW_RANGE_LIST = [.05,.1,.2]
 
+LEGEND_X=-0.1
+LEGEND_Y=1.2
 
 
 
-def plotly_plot(df_in,x_column,plot_title=None,
-                y_left_label=None,y_right_label=None,
-                bar_plot=False,figsize=(16,10),
-                number_of_ticks_display=20,
-                yaxis2_cols=None):
-    ya2c = [] if yaxis2_cols is None else yaxis2_cols
-    ycols = [c for c in df_in.columns.values if c != x_column]
-    # create tdvals, which will have x axis labels
-    td = list(df_in[x_column]) 
-    nt = len(df_in)-1 if number_of_ticks_display > len(df_in) else number_of_ticks_display
-    spacing = len(td)//nt
-    tdvals = td[::spacing]
+
+# def plotly_plot(df_in,x_column,plot_title=None,
+#                 y_left_label=None,y_right_label=None,
+#                 bar_plot=False,figsize=(16,10),
+#                 number_of_ticks_display=20,
+#                 yaxis2_cols=None):
+#     ya2c = [] if yaxis2_cols is None else yaxis2_cols
+#     ycols = [c for c in df_in.columns.values if c != x_column]
+#     # create tdvals, which will have x axis labels
+#     td = list(df_in[x_column]) 
+#     nt = len(df_in)-1 if number_of_ticks_display > len(df_in) else number_of_ticks_display
+#     spacing = len(td)//nt
+#     tdvals = td[::spacing]
     
-    # create data for graph
-    data = []
-    # iterate through all ycols to append to data that gets passed to go.Figure
-    for ycol in ycols:
-        if bar_plot:
-            b = go.Bar(x=td,y=list(df_in[ycol]),name=ycol,yaxis='y' if ycol not in ya2c else 'y2')
-        else:
-            b = go.Scatter(x=td,y=list(df_in[ycol]),name=ycol,yaxis='y' if ycol not in ya2c else 'y2')
-        data.append(b)
+#     # create data for graph
+#     data = []
+#     # iterate through all ycols to append to data that gets passed to go.Figure
+#     for ycol in ycols:
+#         if bar_plot:
+#             b = go.Bar(x=td,y=list(df_in[ycol]),name=ycol,yaxis='y' if ycol not in ya2c else 'y2')
+#         else:
+#             b = go.Scatter(x=td,y=list(df_in[ycol]),name=ycol,yaxis='y' if ycol not in ya2c else 'y2')
+#         data.append(b)
 
-    # create a layout
-    layout = go.Layout(
-        autosize=True,
-        title=plot_title,
-        xaxis=dict(
-            ticktext=tdvals,
-            tickvals=tdvals,
-            tickangle=45,
-            type='category'),
-        yaxis=dict(
-            title='y main' if y_left_label is None else y_left_label
-        ),
-        yaxis2=dict(
-            title='y alt' if y_right_label is None else y_right_label,
-            overlaying='y',
-            side='right'),
-        margin=Margin(
-            b=100
-        )        
-    )
+#     # create a layout
+#     layout = go.Layout(
+#         autosize=True,
+#         title=plot_title,
+#         xaxis=dict(
+#             ticktext=tdvals,
+#             tickvals=tdvals,
+#             tickangle=45,
+#             type='category'),
+#         yaxis=dict(
+#             title='y main' if y_left_label is None else y_left_label
+#         ),
+#         yaxis2=dict(
+#             title='y alt' if y_right_label is None else y_right_label,
+#             overlaying='y',
+#             side='right'),
+#         margin=Margin(
+#             b=100
+#         )        
+#     )
 
-    fig = go.Figure(data=data,layout=layout)
-    return fig
+#     fig = go.Figure(data=data,layout=layout)
+#     return fig
 
 
 class IvSkewStatic:
@@ -168,7 +172,7 @@ class IvSkewStatic:
         df_iv_skew = df_iv_skew.rename(columns={c:float(c) for c in df_iv_skew.columns.values if '0.' in c})
         return df_iv_skew, df_iv_final, df_cash_futures  
 
-    def plot_skew_vs_atm(self,SYMBOL_TO_RESEARCH,dist_from_zero=.1,year=None):
+    def plot_skew_vs_atm(self,SYMBOL_TO_RESEARCH,dist_from_zero=.1,year=None,number_of_ticks_display=10):
             # Step 00: select only SYMBOL_TO_RESEARCH from DataFrames 
             df_iv_final = self.df_iv_final[self.df_iv_final.symbol.str.slice(0,2)==SYMBOL_TO_RESEARCH].copy()
             df_iv_skew = self.df_iv_skew[self.df_iv_skew.symbol.str.slice(0,2)==SYMBOL_TO_RESEARCH].copy()
@@ -211,18 +215,24 @@ class IvSkewStatic:
             # Step 04: plot skew vs atm_iv
             chart_title = f'{SYMBOL_TO_RESEARCH} skew {dist_from_zero*100}% up and down vs atm vol'
             df_ivs_skew_vs_atm_iv = df_ivs[['settle_date',skew_range_col,'atm_iv']]
-            fig_skew_vs_atm_iv = plotly_plot(df_ivs_skew_vs_atm_iv,x_column='settle_date',yaxis2_cols=['atm_iv'],
-                              y_left_label='iv_skew',y_right_label='atm_iv',plot_title=chart_title)
+            fig_skew_vs_atm_iv = pu.plotly_plot(
+                df_ivs_skew_vs_atm_iv,x_column='settle_date',yaxis2_cols=['atm_iv'],
+                y_left_label='iv_skew',y_right_label='atm_iv',plot_title=chart_title,
+                legend_x= LEGEND_X,legend_y=LEGEND_Y,number_of_ticks_display=number_of_ticks_display
+            )
             
             # Step 05: plot skew vs close
             chart_title = f'{SYMBOL_TO_RESEARCH} skew {dist_from_zero*100}% up and down vs close'
             df_ivs_skew_vs_close = df_ivs[['settle_date',skew_range_col,'close']]
-            fig_skew_vs_close = plotly_plot(df_ivs_skew_vs_close,x_column='settle_date',yaxis2_cols=['close'],
-                              y_left_label='iv_skew',y_right_label='close',plot_title=chart_title)
+            fig_skew_vs_close = pu.plotly_plot(
+                df_ivs_skew_vs_close,x_column='settle_date',yaxis2_cols=['close'],
+                y_left_label='iv_skew',y_right_label='close',plot_title=chart_title,
+                legend_x= LEGEND_X,legend_y=LEGEND_Y,number_of_ticks_display=number_of_ticks_display
+            )
             return fig_skew_vs_atm_iv,fig_skew_vs_close
 
     
-    def plot_atm_vs_close(self,SYMBOL_TO_RESEARCH,year=None):
+    def plot_atm_vs_close(self,SYMBOL_TO_RESEARCH,year=None,number_of_ticks_display=10):
         # Step 00: select only SYMBOL_TO_RESEARCH from DataFrames 
         df_iv_final = self.df_iv_final[self.df_iv_final.symbol.str.slice(0,2)==SYMBOL_TO_RESEARCH].copy()
         df_cash_futures = self.df_cash_futures[self.df_cash_futures.symbol.str.slice(0,2)==SYMBOL_TO_RESEARCH].copy()
@@ -245,8 +255,11 @@ class IvSkewStatic:
         # Step 02: plot atm_iv vs close
         chart_title = f'{SYMBOL_TO_RESEARCH} atm vol vs close'
         df_atm_vs_close = df_atmv[['settle_date','atm_iv','close']]
-        fig_atm_vs_close = plotly_plot(df_atm_vs_close,x_column='settle_date',yaxis2_cols=['close'],
-                          y_left_label='atm_iv',y_right_label='close',plot_title=chart_title)
+        fig_atm_vs_close = pu.plotly_plot(
+            df_atm_vs_close,x_column='settle_date',yaxis2_cols=['close'],
+            y_left_label='atm_iv',y_right_label='close',plot_title=chart_title,
+            legend_x= LEGEND_X,legend_y=LEGEND_Y,number_of_ticks_display=number_of_ticks_display
+        )
         return fig_atm_vs_close
 
 
