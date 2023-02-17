@@ -14,8 +14,31 @@ function hideDiv(div_id) {
     document.getElementById(div_id).classList.add("hide");
 };
 
+function add_class(tag_id,class_name) {
+  var element = document.getElementById(tag_id);
+  try {
+    element.classList.add(class_name);
+  }
+  catch (error){
+  }
+};
 
+function remove_class(tag_id,class_name) {
+  var element = document.getElementById(tag_id);
+  try {
+    element.classList.remove(class_name);
+  }
+  catch (error){
+  }
+};
 
+function start_blink_get_data(){
+  add_class("getdata_button","blink")
+}
+
+function stop_blink_get_data(){
+  remove_class("getdata_button","blink")
+}
 
 function render_bar_plot(
   json_results,
@@ -328,6 +351,7 @@ async function get_graphs(){
   var year_choice = document.getElementById('year_select').value;
   year_choice = Math.floor( year_choice );
   render_skew(commodity=commodity_choice,year=year_choice);
+  stop_blink_get_data();
 }
 
 async function render_skew(commodity='CL',year=2020){

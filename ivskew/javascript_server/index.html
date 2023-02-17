@@ -22,7 +22,7 @@
     <div class="row">
       <button  class="col-xs-5 selectinbutton">
         <label  for="commodity">Select a Commodity:&nbsp;</label>
-        <select id="commodity_select" name="commodity" id="commodity">
+        <select id="commodity_select" name="commodity" id="commodity" onchange="start_blink_get_data()">
           <option value="CL">CL</option>
           <option value="NG">NG</option>
           <option value="ES">ES</option>
@@ -31,15 +31,16 @@
       </button>
       <button class="col-xs-5 selectinbutton">
         <label  for="year">Select a Year:&nbsp;</label>
-        <select id="year_select" name="year" id="year">
+        <select id="year_select" name="year" id="year"  onchange="start_blink_get_data()">
           <option value="2017">2017</option>
           <option value="2018">2018</option>
           <option value="2019">2019</option>
           <option value="2020" selected>2020</option>
         </select>  
       </button>      
-      <button class="col-xs-2 selectinbutton">
-        <input style="border:none" type="submit" value="Submit" onclick="get_graphs()">
+      <button id="getdata_button" class="col-xs-2 getdatabutton" onclick="get_graphs()">
+        GET DATA
+<!--         <input style="border:none" type="submit" value="GET</br>DATA" onclick="get_graphs()"> -->
       </button>
     </div>
 

@@ -75,6 +75,33 @@
     background-color: #f2d472;
   }
 
+  .getdatabutton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height:60px;
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+    text-align: center;
+    background-color: #33b249;
+  }
+
+  .blink {
+    animation: blink 2s steps(1, end) infinite;
+  }
+
+  @keyframes blink {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+}  
+
 label {
   text-align: center;
 }
