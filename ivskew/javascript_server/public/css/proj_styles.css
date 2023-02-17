@@ -114,6 +114,12 @@ label {
     background-color: #f2d472;
   }
 
+  .table_caption {
+    color:#47bacc;
+    text-align:center;
+    font-weight: bold
+  }
+
   input[type="file"]::file-selector-button  {
     height:30px;
     font-family: 'Times New Roman', serif;

@@ -131,13 +131,17 @@ async function get_local_csv_file() {
   }
 };
 
-
+function string_to_float(c){
+  ret =  isNaN(parseFloat(c)) ? c : parseFloat(c);
+  return ret;
+}
 
 function convert_cols(col){
   if (col in COLS_CONVERSIONS){
     return COLS_CONVERSIONS[col];
   }
-  return col;
+  // return col;
+  return string_to_float(col);
 }
 
 function convert_df_col_names(row){
@@ -146,7 +150,6 @@ function convert_df_col_names(row){
     {}, ...row_keys.map(
       (x) => (
         {
-          // [cols_conversions[x]]:row[x]
           [convert_cols(x)]:row[x]
         }
       )
@@ -220,57 +223,86 @@ async function display_candlestick_chart(){
 
 }
 
-
-function display_dataframe_json(json_results,json_results_key,cols_to_display,tag_id) {
+function display_dataframe_json(json_results,json_results_key,
+  cols_to_display=[],tag_id,page_len=10) {
   var df = json_results[json_results_key];
   // convert the keys of that df_portfolio rows to keys that have smaller lengths, like 'symbol' will be 'sym'.
   df = convert_df(df);
+
   // these are the shorter length keys that we will display in the datatables
-  const converted_cols = cols_to_display.map(c=>convert_cols(c));
+  var converted_cols = Object.keys(df[0]);
+  if (cols_to_display.length>0){
+    converted_cols = cols_to_display.map(c=>convert_cols(c));  
+  }
+  
   // this is the dictionary that you pass to datatable
   var dt_cols = converted_cols.map(function(c){
-    return {"data":c,"title":c,"visible":c[0]!=='_'}
+    return {
+      "data":c,
+      "title":c.toString(),
+      "visible":c[0]!=='_',
+    }
   });
+  // get original caption
+  const original_caption = document.getElementById(tag_id+'_caption');
   
   // display datatable
   if ( ! $.fn.DataTable.isDataTable("#"+tag_id) ) {
-    // // these are the shorter length keys that we will display in the datatables
-    // const converted_cols = cols_to_display.map(c=>convert_cols(c));
-    // // this is the dictionary that you pass to datatable
-    // var dt_cols = converted_cols.map(function(c){
-    //   return {"data":c,"title":c}
-    // });
     // display the datatable
     $("#"+tag_id).dataTable( {
         "data": df,
         "columns":dt_cols,
         "order": [[0, 'asc']],
-        "pageLength": 10,
+        "pageLength": page_len,
         "searching": false,
         "lengthChange": false,
         "info":false,
         "scrollX": true,
     } );      
   } else {
-    $("#"+tag_id).dataTable( {
-        "data": df,
-        "columns":dt_cols,
-        "order": [[0, 'asc']],
-        "pageLength": 10,
-        "searching": false,
-        "lengthChange": false,
-        "info":false,
-        "scrollX": true,
-        "destroy":true,
-    } );      
+    var dt = $("#"+tag_id).dataTable();
+    dt.fnClearTable();
+    dt.fnAddData(df,redraw=true);
+
+    // $("#"+tag_id).dataTable( {
+    //     "data": df,
+    //     "columns":dt_cols,
+    //     "order": [[0, 'asc']],
+    //     "pageLength": page_len,
+    //     "searching": false,
+    //     "lengthChange": false,
+    //     "info":false,
+    //     "scrollX": true,
+    //     "destroy":true,
+    // } );
+    
+    // // Get the table element by its ID
+    // const table = document.getElementById(tag_id);
+
+    // // Create a caption element
+    // const caption = document.createElement("caption");
+    // caption.innerText = "This is the table caption";
+
+    // // Add the caption element to the table
+    // table.appendChild(caption);
+      
   }        
 };
 
+function convert_df_for_display(row,columns){
+  var x={};
+  for (var i=0;i<columns.length;i++){
+    x[columns[i]] = row[columns[i]];
+  }
+  return x;
+};
+
 function display_json_results(json_results) {
-  // use display_dataframe_json and render_bar_plot to show json_results
-  display_dataframe_json(json_results,'spdr_etfs',['symbol','position'],'spdr_etfs');
-  display_dataframe_json(json_results,'spdr_etf_options',['symbol','position'],'spdr_etf_options');
-  display_candlestick_chart();
+  // use display_dataframe_json and render_bar_plot to show json_results  
+  var df = json_results['df_iv_skew'];
+  const iv_skew_cols = Object.keys(df[0]).map((c)=>string_to_float(c));
+  display_dataframe_json(
+    json_results,'df_iv_skew',iv_skew_cols,'df_iv_skew',page_len=50);
 };
 
 async function display_spdr_etf_csvs(){
@@ -342,6 +374,7 @@ async function render_skew(commodity='CL',year=2020){
         plot_config
         );  
     }
+    display_json_results(json);
   } else {
       alert("HTTP-Error: " + response.status);
       return null;

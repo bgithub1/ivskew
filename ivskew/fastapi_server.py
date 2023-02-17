@@ -69,7 +69,29 @@ async def get_futures_skew(commodity:str='CL',year:int=2020):
         fig1 = fig1.to_dict()
         fig2 = fig2.to_dict()
         atm_vs_skew.append({'skew_vs_atm_iv':fig1,'skew_vs_close':fig2})
-    return_dict['skew_vs_atm_close'] = atm_vs_skew    
+    return_dict['skew_vs_atm_close'] = atm_vs_skew 
+
+    df_iv_skew = sks.df_iv_skew.copy()
+    
+    c1 = df_iv_skew.settle_date >= y*100*100
+    c2 = df_iv_skew.settle_date < (y+1)*100*100
+    c3 = df_iv_skew.commod == commodity
+    
+    df_iv_skew = df_iv_skew[c1 & c2 & c3]
+    
+    non_skew_cols = ['settle_date','symbol']
+    
+    skew_cols = [
+        c 
+        for c in df_iv_skew.columns.values 
+        if (c not in non_skew_cols + ['commod']) and (c!=0)
+    ]
+    
+    df_iv_skew = df_iv_skew[non_skew_cols + skew_cols]
+    df_iv_skew = df_iv_skew.sort_values('settle_date')
+    return_dict['df_iv_skew'] = df_iv_skew.to_dict(orient='records')
+    # return_dict['df_iv_final'] = sks.df_iv_final.to_dict(orient='records')
+    # return_dict['df_cash_futures'] = sks.df_cash_futures.to_dict(orient='records')
     return return_dict
 
 
